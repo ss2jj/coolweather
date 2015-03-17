@@ -14,6 +14,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.xj.coolweather.service.AutoUpdateService;
 import com.xj.coolweather.util.HttpCallbackListener;
 import com.xj.coolweather.util.HttpUtil;
 import com.xj.coolweather.util.Utility;
@@ -48,6 +49,7 @@ protected void onCreate(Bundle savedInstanceState) {
     switchCity = (Button) findViewById(R.id.switch_city);
     refreshWeather = (Button) findViewById(R.id.refresh_weather);
     String countyCode = getIntent().getStringExtra("county_code");
+    startService(new Intent(this,AutoUpdateService.class));
     if(countyCode != null)  {
         publishText.setText("Í¬²½ÖÐ...");
         weatherInfoLayout.setVisibility(View.INVISIBLE);
