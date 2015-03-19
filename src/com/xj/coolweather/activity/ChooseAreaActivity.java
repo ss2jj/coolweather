@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.AdapterView;
@@ -70,6 +71,7 @@ private boolean isFromWeatherAcivity;
                     // TODO Auto-generated method stub
                     if(currentLevel == LEVEL_PROVINCE)  {
                         selectedProvince =  provinceList.get(arg2);
+                        Log.i("XUJIA",selectedProvince.getProvince_code()+"   id"+selectedProvince.getId());
                         queryCities();
                     }else if(currentLevel == LEVEL_CITY)    {
                         selectedCity = cityList.get(arg2);
@@ -137,10 +139,11 @@ private boolean isFromWeatherAcivity;
     private void queryFromServer(final String code,final String type)   {
         String address;
         if(code != null)    {
-            address = "http://www.weather.com.cn/data/list3/city"+code+".xml";
+            address = "http://webservice.webxml.com.cn/WebServices/WeatherWS.asmx/getSupportCityString?theRegionCode="+code;
         }else {
-            address = "http://www.weather.com.cn/data/list3/city.xml";
+            address = "http://webservice.webxml.com.cn/WebServices/WeatherWS.asmx/getRegionProvince";
         }
+        //http://webservice.webxml.com.cn/WebServices/WeatherWS.asmx/getWeather?theCityCode=2009&theUserID=123
         showProgressDialog();
         HttpUtil.sendHttpRequest(address, new HttpCallbackListener() {
          

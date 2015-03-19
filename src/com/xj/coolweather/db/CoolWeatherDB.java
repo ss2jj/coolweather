@@ -52,6 +52,7 @@ public List<Province>  loadProvince()   {
             Province province = new Province();
             province.setProvice_name(cursor.getString(cursor.getColumnIndex("province_name")));
             province.setProvince_code(cursor.getString(cursor.getColumnIndex("province_code")));
+            province.setId(cursor.getInt(cursor.getColumnIndex("id")));
             list.add(province);
         }while(cursor.moveToNext());
     }

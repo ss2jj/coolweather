@@ -3,6 +3,8 @@ package com.xj.coolweather.util;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.util.Log;
+import android.util.Xml;
 
 import com.xj.coolweather.db.CoolWeatherDB;
 import com.xj.coolweather.model.City;
@@ -11,28 +13,52 @@ import com.xj.coolweather.model.Province;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
 
+import java.io.ByteArrayInputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
 public class Utility {
+   
 /*
  * 解析和返回省级数据
  */
     public synchronized static boolean handleProvincesResponce(CoolWeatherDB db,String response)    {
-        if(response != null)    {
-            String [] allProvinces = response.split(",");
-            if(allProvinces != null && allProvinces.length>0)   {
-            for(int i =0;i<allProvinces.length;i++)    {
-                String [] array = allProvinces[i].split("\\|");
-                Province province = new Province();
-                province.setProvice_name(array[1]);
-                province.setProvince_code(array[0]);
-                db.save(province);
+        Log.i("xujia",""+response);
+        if(response != null)   {
+              XmlPullParser parser = Xml.newPullParser();
+              try {
+                parser.setInput(new ByteArrayInputStream(response.getBytes()), "UTF-8");
+                int eventType = parser.getEventType();
+                while(eventType !=  XmlPullParser.END_DOCUMENT) {
+                    switch(eventType)   {
+                        case XmlPullParser.START_TAG:
+                                String name = parser.getName();
+                                Province province = new Province();
+                                if(name.equals("string"))   {
+                                    String provinceStrings = parser.nextText();
+                                    String p[] = provinceStrings.split(",");
+                                    province.setProvice_name(p[0]);
+                                    province.setProvince_code(p[1]);
+                                    db.save(province);
+                                    province = null;
+                                }
+                                break;
+                        case XmlPullParser.END_TAG:
+                            break;
+                          
+                    }
+                    eventType = parser.next();
+                }
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+                return false;
             }
-            return true;
-            }
+         return true;
         }
         return false;
     }
@@ -43,19 +69,37 @@ public class Utility {
      */
         public synchronized static boolean handleCtiiesResponce(CoolWeatherDB db,String response,int provinceId)    {
             if(response != null)    {
-                String [] allCities = response.split(",");
-                if(allCities != null && allCities.length>0)   {
-                for(int i =0;i<allCities.length;i++)    {
-                    String [] array = allCities[i].split("\\|");
-                    City city = new City();
-                    city.setCity_name(array[1]);
-                    city.setCity_code(array[0]);
-                    city.setProvince_id(provinceId);
-                    db.save(city);
-                }
-                return true;
-                }
-            }
+                XmlPullParser parser = Xml.newPullParser();
+                try {
+                  parser.setInput(new ByteArrayInputStream(response.getBytes()), "UTF-8");
+                  int eventType = parser.getEventType();
+                  while(eventType !=  XmlPullParser.END_DOCUMENT) {
+                      switch(eventType)   {
+                          case XmlPullParser.START_TAG:
+                                  String name = parser.getName();
+                                  City city = new City();
+                                  if(name.equals("string"))   {
+                                      String cityStrings = parser.nextText();
+                                      String p[] = cityStrings.split(",");
+                                      city.setCity_name(p[0]);
+                                      city.setCity_code(p[1]);
+                                      city.setProvince_id(provinceId);
+                                      db.save(city);
+                                      city = null;
+                                  }
+                                  break;
+                          case XmlPullParser.END_TAG:
+                              break;
+                            
+                      }
+                      eventType = parser.next();
+                  }
+              } catch (Exception e) {
+                  // TODO Auto-generated catch block
+                  e.printStackTrace();
+                  return false;
+              }
+           return true; }
             return false;
         }
         
